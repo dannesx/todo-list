@@ -1,42 +1,31 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { useColorMode } from "@vueuse/core"
-import SelectPriority from "./components/SelectPriority.vue"
-import { PlusCircle } from "lucide-vue-next"
+import { ref, onMounted } from "vue"
 import TaskCard from "./components/TaskCard.vue"
 import type Task from "./types/Task"
 import Separator from "./components/ui/separator/Separator.vue"
+import TaskForm from "./components/TaskForm.vue"
+import { taskService } from "./services/api"
 
 const mode = useColorMode()
 mode.value = "dark"
 
-const tasks: Task[] = [
-  {
-    id: 1,
-    title: "Learn Vue.js",
-    priority: "high",
-    completed: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    title: "Learn Laravel",
-    priority: "high",
-    completed: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    title: "Take out the trash",
-    priority: "medium",
-    completed: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-]
+const tasks = ref<Task[]>([])
+const loading = ref(false)
+
+const fetchTasks = async () => {
+  loading.value = true
+  try {
+    const response = await taskService.getAll()
+    tasks.value = response.data
+  } catch (error) {
+    console.error("Failed to fetch tasks", error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => fetchTasks())
 </script>
 
 <template>
@@ -47,16 +36,9 @@ const tasks: Task[] = [
       <code>Laravel PHP</code>
     </p>
 
-    <div class="flex gap-3 sm:gap-2 mb-6 flex-col sm:flex-row">
-      <Input placeholder="Add task" class="flex-1" />
-      <SelectPriority />
-      <Button>
-        <PlusCircle />
-        Add task
-      </Button>
-    </div>
+    <TaskForm />
 
-    <Separator class="my-6"/>
+    <Separator class="my-6" />
 
     <div class="space-y-4">
       <TaskCard v-for="task in tasks" :task />
