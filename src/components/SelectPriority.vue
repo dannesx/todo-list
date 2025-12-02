@@ -5,8 +5,8 @@ import SelectValue from "./ui/select/SelectValue.vue"
 </script>
 
 <template>
-  <Select>
-    <SelectTrigger>
+  <Select >
+    <SelectTrigger class="w-full sm:w-auto">
       <SelectValue placeholder="Priority" />
     </SelectTrigger>
     <SelectContent>
